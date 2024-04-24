@@ -120,7 +120,6 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
   }
 
   async findOne(id: string) {
-    console.log('id',id)
     const order = await this.order.findFirst({
       where: { id },
       include: {
@@ -133,18 +132,13 @@ export class OrdersService extends PrismaClient implements OnModuleInit {
         },
       },
     });
-
-console.log('order',order)
-
     if (!order) {
       throw new RpcException({
         status: HttpStatus.NOT_FOUND,
         message: `Order with id ${id} not found`,
       });
     }
-
     const productsIds = order.OrderItem.map(orderItem => orderItem.productId);
-
     const products = await firstValueFrom(
         this.clientProducts.send({ cmd: 'validate-product' }, productsIds),
       );
